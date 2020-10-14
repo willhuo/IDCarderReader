@@ -55,20 +55,33 @@ namespace ReadIDCardApp
 
             if (objIDCardInfo != null)
             {
-                //赋值
-                txtIDCard.Text = objIDCardInfo.CardNo;
-                txtName1.Text = objIDCardInfo.Name;
-                txtSex1.Text = objIDCardInfo.Sex;
-                txtBirthday1.Text = objIDCardInfo.Birthday;
-                txtStartDate1.Text = objIDCardInfo.StartDate;
-                txtEndDate1.Text = objIDCardInfo.EndDate;
-                txtNation1.Text = objIDCardInfo.Nation;
-                txtAddress1.Text = objIDCardInfo.Address;
+                try
+                {
+                    //赋值
+                    txtIDCard.Text = objIDCardInfo.CardNo;
+                    txtName1.Text = objIDCardInfo.Name;
+                    txtSex1.Text = objIDCardInfo.Sex;
+                    txtBirthday1.Text = objIDCardInfo.Birthday;
+                    txtStartDate1.Text = objIDCardInfo.StartDate;
+                    txtEndDate1.Text = objIDCardInfo.EndDate;
+                    txtNation1.Text = objIDCardInfo.Nation;
+                    txtAddress1.Text = objIDCardInfo.Address;
 
-                System.IO.MemoryStream objMSPhoto = new System.IO.MemoryStream(objIDCardInfo.ArrPhotoByte, 0, objIDCardInfo.ArrPhotoByte.Length);
-                Image objImage = Image.FromStream(objMSPhoto);
-                this.panel1.BackgroundImage = objImage;
-
+                    if (File.Exists(objIDCardInfo.PhotoPath))
+                    {
+                        Image objImage = Image.FromFile(objIDCardInfo.PhotoPath);
+                        this.panel1.BackgroundImage = objImage;
+                    }
+                    else
+                    {
+                        Serilog.Log.Warning("身份证照片不存在，目标路径为：{0}", objIDCardInfo.PhotoPath);
+                    }
+                }
+                catch(Exception ex)
+                {
+                    Serilog.Log.Error(ex,"读卡异常");
+                    MessageBox.Show(ex.Message);
+                }                
             }
         }
 

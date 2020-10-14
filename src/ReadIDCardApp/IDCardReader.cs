@@ -4,6 +4,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Drawing;
 using System.Windows.Forms;
+using Newtonsoft.Json;
 
 namespace ReadIDCardApp
 {
@@ -108,8 +109,10 @@ namespace ReadIDCardApp
 
                 if (ret == 0)  //身份证验证成功62171
                 {
+                    Serilog.Log.Warning("身份证验证成功");
                     cmd = 0x49;    //读卡
                     ret = UCommand1(ref cmd, ref parg0, ref parg1, ref parg2);    // '读卡内信息
+                    Serilog.Log.Warning("身份证读卡信息完成，ret={0}",ret);
 
                     if (ret == 62171|| ret == 62172 || ret == 62173 || ret == 62174)
                     {
@@ -118,9 +121,9 @@ namespace ReadIDCardApp
                         switch (ret)
                         {
                             case 62171:
-                                break;
-                            case 62172:
                                 {
+                                    var idcardInfoPath = sSavePath + "wx.txt";
+                                    Serilog.Log.Warning("身份证信息读取路径：" + idcardInfoPath);
                                     System.IO.StreamReader objStreamReader = new System.IO.StreamReader(sSavePath + "wx.txt", Encoding.Default);
                                     objCardInfo.Name = objStreamReader.ReadLine();
                                     objCardInfo.Sex = objStreamReader.ReadLine();
@@ -131,13 +134,40 @@ namespace ReadIDCardApp
                                     objCardInfo.Department = objStreamReader.ReadLine();
                                     objCardInfo.StartDate = objStreamReader.ReadLine();
                                     objCardInfo.EndDate = objStreamReader.ReadLine();
-                                    objCardInfo.PhotoPath = sSavePath + @"/zp.bmp";
+                                    objCardInfo.PhotoPath = sSavePath + "zp.bmp";
 
-                                    string sPhotoPath = objCardInfo.PhotoPath;
-                                    objCardInfo.ArrPhotoByte = ImageToByteArray(sPhotoPath);
+                                    //string sPhotoPath = objCardInfo.PhotoPath;
+                                    //objCardInfo.ArrPhotoByte = ImageToByteArray(sPhotoPath);
 
                                     objStreamReader.Close();
                                     objStreamReader.Dispose();
+
+                                    Serilog.Log.Warning("身份证信息为：{0}", JsonConvert.SerializeObject(objCardInfo));
+                                }
+                                break;
+                            case 62172:
+                                {
+                                    var idcardInfoPath = sSavePath + "wx.txt";
+                                    Serilog.Log.Warning("身份证信息读取路径："+idcardInfoPath);
+                                    System.IO.StreamReader objStreamReader = new System.IO.StreamReader(sSavePath + "wx.txt", Encoding.Default);
+                                    objCardInfo.Name = objStreamReader.ReadLine();
+                                    objCardInfo.Sex = objStreamReader.ReadLine();
+                                    objCardInfo.Nation = objStreamReader.ReadLine();
+                                    objCardInfo.Birthday = objStreamReader.ReadLine();
+                                    objCardInfo.Address = objStreamReader.ReadLine();
+                                    objCardInfo.CardNo = objStreamReader.ReadLine();
+                                    objCardInfo.Department = objStreamReader.ReadLine();
+                                    objCardInfo.StartDate = objStreamReader.ReadLine();
+                                    objCardInfo.EndDate = objStreamReader.ReadLine();
+                                    objCardInfo.PhotoPath = sSavePath + "zp.bmp";
+
+                                    //string sPhotoPath = objCardInfo.PhotoPath;
+                                    //objCardInfo.ArrPhotoByte = ImageToByteArray(sPhotoPath);
+
+                                    objStreamReader.Close();
+                                    objStreamReader.Dispose();
+
+                                    Serilog.Log.Warning("身份证信息为：{0}",JsonConvert.SerializeObject(objCardInfo));
                                 }
                                 break;
                             case 62173:
